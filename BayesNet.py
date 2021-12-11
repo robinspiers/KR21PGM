@@ -10,9 +10,12 @@ from copy import deepcopy
 
 class BayesNet:
 
-    def __init__(self) -> None:
+    def __init__(self, net=None) -> None:
         # initialize graph structure
-        self.structure = nx.DiGraph()
+        if net is None:
+            self.structure = nx.DiGraph()
+        else:
+            self.structure = net
 
     # LOADING FUNCTIONS ------------------------------------------------------------------------------------------------
     def create_bn(self, variables: List[str], edges: List[Tuple[str, str]], cpts: Dict[str, pd.DataFrame]) -> None:
@@ -83,7 +86,48 @@ class BayesNet:
         :param variable: Variable to get the children from
         :return: List of children
         """
+        return [p for p in self.structure.predecessors(variable)]
+
+    def get_all_descendants(self, variable: list):
+        """
+        Returns all the nodes from self.structure which are descendants of variable
+        :param variable: ancestor(s) of output variables; Must be a list of any length
+        :return: list of all nodes with variable(s) as ancestor
+        """
+        descendants = []; nodes_to_visit = variable
+
+        while len(nodes_to_visit) > 0.0:
+            node = nodes_to_visit.pop()
+            for child in self.get_children(node):
+                if child not in descendants:
+                    nodes_to_visit.append(child)
+                    descendants.append(child)
+        return descendants
+
+    def get_parents(self, variable: str) -> List[str]:
+        """
+        Returns the children of the variable in the graph.
+        :param variable: Variable to get the children from
+        :return: List of children
+        """
         return [c for c in self.structure.successors(variable)]
+
+    def get_all_ancestors(self, variable: list):
+        """
+        Returns all the nodes from self.structure which are ancestors of variable
+        :param variable: descendant(s) of output variables; Must be a list of any length
+        :return: list of all nodes with variable as descendant
+        """
+        ancestors = []; nodes_to_visit = variable
+
+        while len(nodes_to_visit) > 0.0:
+            node = nodes_to_visit.pop()
+            for parent in self.get_parents(node):
+                if parent not in ancestors:
+                    nodes_to_visit.append(parent)
+                    ancestors.append(parent)
+        return ancestors
+
 
     def get_cpt(self, variable: str) -> pd.DataFrame:
         """
@@ -105,7 +149,7 @@ class BayesNet:
 
     def get_all_cpts(self) -> Dict[str, pd.DataFrame]:
         """
-        Returns a dictionary of all cps in the network indexed by the variable they belong to.
+        Returns a dictionary of all CPTs in the network indexed by the variable they belong to.
         :return: Dictionary of all CPTs
         """
         cpts = {}
