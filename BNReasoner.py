@@ -84,8 +84,55 @@ class BNReasoner:
         return True
 
 
-    def order(self):
-        return
+    def mindeg_order(self, X: list):
+        # initialize
+        G = self.bn.get_interaction_graph()
+        pi = []; degrees = []
+
+        while len(X) > 0:
+            degrees = [G.degree[var] for var in X]
+            chosen_node = X.pop(degrees.index(min(degrees)))
+            pi.append(chosen_node)
+
+            # connect all non-adjacent neighbors of chosen node
+            nbors = [neighbor for neighbor in G.neighbors()]
+            for u in nbors:
+                for v in [n for n in nbors if n is not u]:
+                    if (u, v) not in G.edges() and (v, u) not in G.edges():
+                        G.add_edge(u, v)
+            G.remove_node(chosen_node)
+
+        return pi
+
+    def minfill_order(self, X: list):
+        # initialize
+        G = self.bn.get_interaction_graph()
+        pi = []
+
+        while len(X) > 0:
+            # find node that produces lowest number of new edges when eliminated
+            n_fills = []
+            for node in X:
+                n_fill = 0
+                nbors = [neighbor for neighbor in G.neighbors(node)]
+                for u in nbors:
+                    for v in [n for n in nbors if n is not u]:
+                        if (u, v) not in G.edges() and (v, u) not in G.edges():
+                            n_fill += 1
+                n_fills.append(n_fill)
+
+            chosen_node = X.pop(n_fills.index(min(n_fills)))
+            pi.append(chosen_node)
+
+            # connect all non-adjacent neighbors of chosen node
+            nbors = [neighbor for neighbor in G.neighbors(chosen_node)]
+            for u in nbors:
+                for v in [n for n in nbors if n is not u]:
+                    if (u, v) not in G.edges() and (v, u) not in G.edges():
+                        G.add_edge(u, v)
+            G.remove_node(chosen_node)
+
+        return pi
 
     def marginal_dist(self):
         return
