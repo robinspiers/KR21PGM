@@ -17,8 +17,13 @@ class BNReasoner:
         else:
             self.bn = net
 
-    # TODO: This is where your methods should go
     def prune_network(self, X: list, Y: list):
+        """
+        This function prunes the network w.r.t. X given Y
+        :param X: Set of variables we are interested in
+        :param Y: Set of variables that are observed
+        :return: pruned network G_pruned
+        """
         G_pruned = BayesNet(self.bn.structure.copy())
         gp_nodes = self.bn.get_all_variables()
 
@@ -44,6 +49,7 @@ class BNReasoner:
     def d_separated(self, X: list, Y: list, Z: list, prune=True):
         """
         Is X independent of Y, given Z.
+        Following algorithm from p.75 of 'Probabilistic Graphical Models: Principles and Techniques'
         :parameters: lists of variables in graph G
         :output: Boolean (d-separated or not)
         """
@@ -85,6 +91,11 @@ class BNReasoner:
 
 
     def mindeg_order(self, X: list):
+        """
+        This function orders variables for elimination with the minimum degree heuristic
+        :param X: list of variables from self.structure.nodes
+        :return: ordered list of variables
+        """
         # initialize
         G = self.bn.get_interaction_graph()
         pi = []; degrees = []
@@ -105,6 +116,11 @@ class BNReasoner:
         return pi
 
     def minfill_order(self, X: list):
+        """
+        This function orders variables for elimination with the minimum fill heuristic
+        :param X: list of variables from self.structure.nodes
+        :return: ordered list of variables
+        """
         # initialize
         G = self.bn.get_interaction_graph()
         pi = []
@@ -134,5 +150,27 @@ class BNReasoner:
 
         return pi
 
-    def marginal_dist(self):
-        return
+    def compute_marginal(self, query, pi, evidence=None):
+        if evidence:
+            marg = 'posterior'
+        else:
+            marg = 'prior'
+
+        cpts = self.bn.get_all_cpts()
+
+        for i, var in enumerate(pi):
+            fk = {}
+            for idx, cpt in enumerate(cpts):
+                if var in cpts[cpt].columns:
+                    fk[cpt] = cpts[cpt]
+
+            for cpt in fk:
+                cpts.pop(cpt)
+
+            f = [fk[cpt] for cpt in fk]
+            f = self.bn.factor_product(f)
+            f = self.bn.marginalize(f, [var])
+            new_key = 'f'+str(i)
+            cpts[new_key] = f
+
+        return f
