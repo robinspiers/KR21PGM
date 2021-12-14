@@ -153,18 +153,17 @@ class BayesNet:
                 marg[tuple(row.values)] += factor_x[index]
 
         marg_cpt = pd.DataFrame(columns=[*list(Y.columns),'p'])
-
         for key in marg:
             new_row = {}
-            for var in range(len(y_names)):
-                new_row[y_names[var]] = key[var]
-            new_row['p'] = marg[key]
-            nr = [[a for a in new_row.values()]]
+            for i, var in enumerate(y_names):
+                new_row[var] = key[var]
+            new_row['p'] = marg[key]; nr = [[a for a in new_row.values()]]
             new_row = pd.DataFrame(nr, columns=list(new_row.keys()))
             marg_cpt = pd.concat([marg_cpt, new_row])
+
         return marg_cpt
 
-    def factor_product(self,cpts: list):
+    def factor_product(self, cpts: list):
         all_names = list(set.union(*[set(names.columns) for names in cpts]).difference({'p'}))
         ttable = list(itertools.product([False, True], repeat=len(all_names)))
         new_cpt = pd.DataFrame(data=ttable, columns=all_names)
@@ -177,6 +176,22 @@ class BayesNet:
         new_cpt['p'] = d[columns].product(axis=1)
 
         return new_cpt
+
+    def normalize_factors(self, cpts: dict, evidence: dict):
+        e = [[a for a in evidence.values()]]
+        e = pd.DataFrame(e, columns=evidence.keys())
+        normalized_cpts = cpts.copy()
+
+        for key in cpts:
+            if any(item in evidence.keys() for item in cpts[key].columns):
+                for idx, row in normalized_cpts[key].iterrows():
+                    overlapping_vars = list(set(row.index).intersection(set(evidence.keys())))
+                    for ev in overlapping_vars:
+                        a = cpts[key][ev][idx]; b = evidence[ev]
+                        if a != b:
+                            normalized_cpts[key]['p'][idx] = 0.0
+                            break
+        return normalized_cpts
 
     def get_all_variables(self) -> List[str]:
         """

@@ -150,13 +150,12 @@ class BNReasoner:
 
         return pi
 
-    def compute_marginal(self, query, pi, evidence=None):
-        if evidence:
-            marg = 'posterior'
-        else:
-            marg = 'prior'
-
+    def compute_marginal(self, pi, evidence: dict = None):
         cpts = self.bn.get_all_cpts()
+
+        # if calculatign posterior marginals, then we normalize CPTs
+        if evidence:
+            cpts = self.bn.normalize_factors(cpts, evidence)
 
         for i, var in enumerate(pi):
             fk = {}
