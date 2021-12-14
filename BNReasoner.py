@@ -17,9 +17,9 @@ class BNReasoner:
         else:
             self.bn = net
 
-    def prune_network(self, X: list, Y: list):
+    def prune_network(self, X: list = None, Y: dict = None):
         """
-        This function prunes the network w.r.t. X given Y
+        This function prunes the network w.r.t. X given evidence Y
         :param X: Set of variables we are interested in
         :param Y: Set of variables that are observed
         :return: pruned network G_pruned
@@ -28,27 +28,42 @@ class BNReasoner:
         gp_nodes = self.bn.get_all_variables()
 
         # iteratively remove leaves not in X or Y
-        while True:
-            vars = gp_nodes.copy()
-            remove_vars = [node for node in vars if not G_pruned.get_children(node) and node not in X and node not in Y]
-            G_pruned.structure.remove_nodes_from(remove_vars)
-            for x in remove_vars:
-                del gp_nodes[gp_nodes.index(x)]
-            if gp_nodes == vars:
-                break
+        if X:
+            while True:
+                vars = gp_nodes.copy()
+                remove_vars = [node for node in vars if not G_pruned.get_children(node) and node not in X and node not in Y]
+                G_pruned.structure.remove_nodes_from(remove_vars)
+                for x in remove_vars:
+                    del gp_nodes[gp_nodes.index(x)]
+                if gp_nodes == vars:
+                    break
 
-        # Remove all edges from Y
-        for node in Y:
-            children = G_pruned.structure.get_children(node)
-            if children:
-                for child in children:
-                    G_pruned.structure.remove_edge(node, child)
+        # Remove all edges going from Y
+        if Y:
+            for node in Y.keys():
+                children = G_pruned.get_children(node)
+                if children:
+                    for child in children:
+                        G_pruned.structure.remove_edge(node, child)
 
-        return G_pruned, gp_nodes
+            # update CPTs
+            updated_cpts = G_pruned.get_all_cpts()
+            for key in updated_cpts:
+                if any(item in Y.keys() for item in updated_cpts[key].columns):
+                    for idx, row in updated_cpts[key].iterrows():
+                        overlapping_vars = list(set(row.index).intersection(set(Y.keys())))
+                        for ev in overlapping_vars:
+                            a = updated_cpts[key][ev][idx]; b = Y[ev]
+                            if a != b:
+                                updated_cpts[key].drop(idx)
+                                break
+                    G_pruned.update_cpt(key, updated_cpts[key])
 
-    def d_separated(self, X: list, Y: list, Z: list, prune=True):
+        return G_pruned
+
+    def d_separated(self, X: list, Y: list, Z: dict, prune=True):
         """
-        Is X independent of Y, given Z.
+        Is X independent of Y, given evidence Z.
         Following algorithm from p.75 of 'Probabilistic Graphical Models: Principles and Techniques'
         :parameters: lists of variables in graph G
         :output: Boolean (d-separated or not)
@@ -59,7 +74,7 @@ class BNReasoner:
             G = BayesNet(self.bn.structure.copy)
 
         # phase I: get all ancestors of Z
-        Z_ancestors = G.get_all_ancestors(Z)
+        Z_ancestors = G.get_all_ancestors(list(Z.keys()))
 
         # phase II: traverse active trails starting from X
         # first initialize to_be_visited, visited and reachable nodes
@@ -89,71 +104,10 @@ class BNReasoner:
                         nodes_to_visit = nodes_to_visit + [(parent, "up") for parent in G.get_parents(selected_node[0])]
         return True
 
-
-    def mindeg_order(self, X: list):
-        """
-        This function orders variables for elimination with the minimum degree heuristic
-        :param X: list of variables from self.structure.nodes
-        :return: ordered list of variables
-        """
-        # initialize
-        G = self.bn.get_interaction_graph()
-        pi = []; degrees = []
-
-        while len(X) > 0:
-            degrees = [G.degree[var] for var in X]
-            chosen_node = X.pop(degrees.index(min(degrees)))
-            pi.append(chosen_node)
-
-            # connect all non-adjacent neighbors of chosen node
-            nbors = [neighbor for neighbor in G.neighbors()]
-            for u in nbors:
-                for v in [n for n in nbors if n is not u]:
-                    if (u, v) not in G.edges() and (v, u) not in G.edges():
-                        G.add_edge(u, v)
-            G.remove_node(chosen_node)
-
-        return pi
-
-    def minfill_order(self, X: list):
-        """
-        This function orders variables for elimination with the minimum fill heuristic
-        :param X: list of variables from self.structure.nodes
-        :return: ordered list of variables
-        """
-        # initialize
-        G = self.bn.get_interaction_graph()
-        pi = []
-
-        while len(X) > 0:
-            # find node that produces lowest number of new edges when eliminated
-            n_fills = []
-            for node in X:
-                n_fill = 0
-                nbors = [neighbor for neighbor in G.neighbors(node)]
-                for u in nbors:
-                    for v in [n for n in nbors if n is not u]:
-                        if (u, v) not in G.edges() and (v, u) not in G.edges():
-                            n_fill += 1
-                n_fills.append(n_fill)
-
-            chosen_node = X.pop(n_fills.index(min(n_fills)))
-            pi.append(chosen_node)
-
-            # connect all non-adjacent neighbors of chosen node
-            nbors = [neighbor for neighbor in G.neighbors(chosen_node)]
-            for u in nbors:
-                for v in [n for n in nbors if n is not u]:
-                    if (u, v) not in G.edges() and (v, u) not in G.edges():
-                        G.add_edge(u, v)
-            G.remove_node(chosen_node)
-
-        return pi
-
     def compute_marginal(self, pi, evidence: dict = None):
         cpts = self.bn.get_all_cpts()
 
-        # if calculatign posterior marginals, then we normalize CPTs
+        # if calculating posterior marginals, then we normalize CPTs wrt the evidence
         if evidence:
             cpts = self.bn.normalize_factors(cpts, evidence)
 
@@ -172,4 +126,57 @@ class BNReasoner:
             new_key = 'f'+str(i)
             cpts[new_key] = f
 
-        return f
+        return cpts
+
+    def MPE(self, evidence: dict, ordering_function=None):
+        cpts = self.bn.get_all_cpts()
+        N_pr = self.prune_network(Y=evidence)   # pruned network
+        Q = N_pr.get_all_variables()            # list of variables from N_pr
+        pi = ordering_function(N_pr, Q)         # ordering of Q
+
+        cpts = self.bn.normalize_factors(cpts, evidence)
+
+        for i, var in enumerate(pi):
+            fk = {}
+            for idx, cpt in enumerate(cpts):
+                if var in cpts[cpt].columns:
+                    fk[cpt] = cpts[cpt]
+
+            for cpt in fk:
+                cpts.pop(cpt)
+
+            f = [fk[cpt] for cpt in fk]
+            f = self.bn.factor_product(f)
+            f = self.bn.maxxing(f, [var])
+            new_key = 'f'+str(i)
+            cpts[new_key] = f
+
+        return cpts
+
+    def MAP(self, query: list, evidence: dict, ordering_function=None):
+        cpts = self.bn.get_all_cpts()
+        N_pr = self.prune_network(X=query, Y=evidence)      # pruned network
+        Q = N_pr.get_all_variables()                        # list of variables from N_pr
+        pi = ordering_function(N_pr, Q, priority=[var for var in Q if var not in query])
+
+        cpts = self.bn.normalize_factors(cpts, evidence)
+
+        for i, var in enumerate(pi):
+            fk = {}
+            for idx, cpt in enumerate(cpts):
+                if var in cpts[cpt].columns:
+                    fk[cpt] = cpts[cpt]
+
+            for cpt in fk:
+                cpts.pop(cpt)
+
+            f = [fk[cpt] for cpt in fk]
+            f = self.bn.factor_product(f)
+
+            if var in query:
+                f = self.bn.maxxing(f, [var])
+            else:
+                f = self.bn.marginalize(f, [var])
+            new_key = 'f'+str(i)
+            cpts[new_key] = f
+        return cpts
