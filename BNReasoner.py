@@ -17,9 +17,9 @@ class BNReasoner:
         else:
             self.bn = net
 
-    def prune_network(self, X: list = None, Y: dict = None):
+    def prune_network(self, X: list = None, evidence: dict = None):
         """
-        This function prunes the network w.r.t. X given evidence Y
+        This function prunes the network w.r.t. X given evidence
         :param X: Set of variables we are interested in
         :param Y: Set of variables that are observed
         :return: pruned network G_pruned
@@ -27,20 +27,20 @@ class BNReasoner:
         G_pruned = BayesNet(self.bn.structure.copy())
         gp_nodes = self.bn.get_all_variables()
 
-        # iteratively remove leaves not in X or Y
+        # iteratively remove leaves not in X or evidence
         if X:
             while True:
                 vars = gp_nodes.copy()
-                remove_vars = [node for node in vars if not G_pruned.get_children(node) and node not in X and node not in Y]
+                remove_vars = [node for node in vars if not G_pruned.get_children(node) and node not in X and node not in evidence]
                 G_pruned.structure.remove_nodes_from(remove_vars)
                 for x in remove_vars:
                     del gp_nodes[gp_nodes.index(x)]
                 if gp_nodes == vars:
                     break
 
-        # Remove all edges going from Y
-        if Y:
-            for node in Y.keys():
+        # Remove all edges going from evidence
+        if evidence:
+            for node in evidence.keys():
                 children = G_pruned.get_children(node)
                 if children:
                     for child in children:
@@ -49,11 +49,11 @@ class BNReasoner:
             # update CPTs
             updated_cpts = G_pruned.get_all_cpts()
             for key in updated_cpts:
-                if any(item in Y.keys() for item in updated_cpts[key].columns):
+                if any(item in evidence.keys() for item in updated_cpts[key].columns):
                     for idx, row in updated_cpts[key].iterrows():
-                        overlapping_vars = list(set(row.index).intersection(set(Y.keys())))
+                        overlapping_vars = list(set(row.index).intersection(set(evidence.keys())))
                         for ev in overlapping_vars:
-                            a = updated_cpts[key][ev][idx]; b = Y[ev]
+                            a = updated_cpts[key][ev][idx]; b = evidence[ev]
                             if a != b:
                                 updated_cpts[key].drop(idx)
                                 break
@@ -61,7 +61,7 @@ class BNReasoner:
 
         return G_pruned
 
-    def d_separated(self, X: list, Y: list, Z: dict, prune=True):
+    def d_separated(self, X: list, Y: list, evidence: dict, prune=True):
         """
         Is X independent of Y, given evidence Z.
         Following algorithm from p.75 of 'Probabilistic Graphical Models: Principles and Techniques'
@@ -69,12 +69,12 @@ class BNReasoner:
         :output: Boolean (d-separated or not)
         """
         if prune:
-            G, gp_vars = self.prune_network(X,Z)
+            G, gp_vars = self.prune_network(X,evidence)
         else:
             G = BayesNet(self.bn.structure.copy)
 
         # phase I: get all ancestors of Z
-        Z_ancestors = G.get_all_ancestors(list(Z.keys()))
+        Z_ancestors = G.get_all_ancestors(list(evidence.keys()))
 
         # phase II: traverse active trails starting from X
         # first initialize to_be_visited, visited and reachable nodes
@@ -87,25 +87,29 @@ class BNReasoner:
             # select some node (including its traversal direction) and remove it from list
             selected_node = nodes_to_visit.pop(nodes_to_visit.index(random.choice(nodes_to_visit)))
             if selected_node not in visited_nodes:
-                if selected_node[0] not in Z:
+                if selected_node[0] not in evidence:
                     reachable_nodes.append(selected_node[0])
                     if selected_node[0] in Y:
                         return False
                 visited_nodes.append(selected_node)
 
-                if selected_node[1] == "up" and selected_node[0] not in Z:
+                if selected_node[1] == "up" and selected_node[0] not in evidence:
                     nodes_to_visit = nodes_to_visit + [(parent, "up") for parent in G.get_parents(selected_node[0])]
                     nodes_to_visit = nodes_to_visit + [(child, "down") for child in G.get_children(selected_node[0])]
 
                 if selected_node[1] == "down":
-                    if selected_node[0] not in Z:
+                    if selected_node[0] not in evidence:
                         nodes_to_visit = nodes_to_visit + [(child, "down") for child in G.get_children(selected_node[0])]
                     if selected_node[0] in Z_ancestors:
                         nodes_to_visit = nodes_to_visit + [(parent, "up") for parent in G.get_parents(selected_node[0])]
         return True
 
-    def compute_marginal(self, pi, evidence: dict = None):
+    def compute_marginal(self, query: list, evidence: dict = None, ordering_function=None):
         cpts = self.bn.get_all_cpts()
+        if ordering_function:
+            pi = ordering_function(self.bn, query)
+        else:
+            pi = query
 
         # if calculating posterior marginals, then we normalize CPTs wrt the evidence
         if evidence:
