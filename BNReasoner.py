@@ -1,7 +1,6 @@
 import random
 from typing import Union
 from BayesNet import BayesNet
-import networkx as nx
 
 
 class BNReasoner:
@@ -17,21 +16,21 @@ class BNReasoner:
         else:
             self.bn = net
 
-    def prune_network(self, X: list = None, evidence: dict = None):
+    def prune_network(self, query: list = None, evidence: dict = None):
         """
         This function prunes the network w.r.t. X given evidence
         :param X: Set of variables we are interested in
-        :param Y: Set of variables that are observed
+        :param evidence: Set of variables that are observed
         :return: pruned network G_pruned
         """
         G_pruned = BayesNet(self.bn.structure.copy())
         gp_nodes = self.bn.get_all_variables()
 
         # iteratively remove leaves not in X or evidence
-        if X:
+        if query:
             while True:
                 vars = gp_nodes.copy()
-                remove_vars = [node for node in vars if not G_pruned.get_children(node) and node not in X and node not in evidence]
+                remove_vars = [node for node in vars if not G_pruned.get_children(node) and node not in query and node not in evidence]
                 G_pruned.structure.remove_nodes_from(remove_vars)
                 for x in remove_vars:
                     del gp_nodes[gp_nodes.index(x)]
@@ -69,7 +68,7 @@ class BNReasoner:
         :output: Boolean (d-separated or not)
         """
         if prune:
-            G, gp_vars = self.prune_network(X,evidence)
+            G = self.prune_network(X,evidence)
         else:
             G = BayesNet(self.bn.structure.copy)
 
@@ -107,10 +106,9 @@ class BNReasoner:
     def compute_marginal(self, query: list, evidence: dict = None, ordering_function=None):
         cpts = self.bn.get_all_cpts()
         if ordering_function:
-            pi = ordering_function(self.bn, query)
+            pi = ordering_function(self.bn, [var for var in self.bn.get_all_variables() if var not in query])
         else:
             pi = query
-
         # if calculating posterior marginals, then we normalize CPTs wrt the evidence
         if evidence:
             cpts = self.bn.normalize_factors(cpts, evidence)
@@ -134,7 +132,7 @@ class BNReasoner:
 
     def MPE(self, evidence: dict, ordering_function=None):
         cpts = self.bn.get_all_cpts()
-        N_pr = self.prune_network(Y=evidence)   # pruned network
+        N_pr = self.prune_network(evidence=evidence)   # pruned network
         Q = N_pr.get_all_variables()            # list of variables from N_pr
         pi = ordering_function(N_pr, Q)         # ordering of Q
 
@@ -159,7 +157,7 @@ class BNReasoner:
 
     def MAP(self, query: list, evidence: dict, ordering_function=None):
         cpts = self.bn.get_all_cpts()
-        N_pr = self.prune_network(X=query, Y=evidence)      # pruned network
+        N_pr = self.prune_network(query=query, evidence=evidence)      # pruned network
         Q = N_pr.get_all_variables()                        # list of variables from N_pr
         pi = ordering_function(N_pr, Q, priority=[var for var in Q if var not in query])
 
@@ -183,4 +181,5 @@ class BNReasoner:
                 f = self.bn.marginalize(f, [var])
             new_key = 'f'+str(i)
             cpts[new_key] = f
+
         return cpts

@@ -139,77 +139,6 @@ class BayesNet:
         except KeyError:
             raise Exception('Variable not in the BN')
 
-    @staticmethod
-    def mindeg_order(net, X: list, priority=None):
-        """
-        This function orders variables for elimination with the minimum degree heuristic
-        :param X: list of variables from self.structure.nodes
-        :return: ordered list of variables
-        """
-        # initialize
-        G = net.get_interaction_graph()
-        pi = []; degrees = []
-
-        while len(X) > 0:
-            if priority:
-                degrees = [G.degree[var] if var in priority else (len(X)+1) for var in X]
-            else:
-                degrees = [G.degree[var] for var in X]
-            chosen_node = X.pop(degrees.index(min(degrees)))
-            pi.append(chosen_node)
-
-            # connect all non-adjacent neighbors of chosen node
-            nbors = [neighbor for neighbor in G.neighbors(chosen_node)]
-            for u in nbors:
-                for v in [n for n in nbors if n is not u]:
-                    if (u, v) not in G.edges() and (v, u) not in G.edges():
-                        G.add_edge(u, v)
-            G.remove_node(chosen_node)
-
-        return pi
-
-    @staticmethod
-    def minfill_order(net, X: list, priority: list = None):
-        """
-        This function orders variables for elimination with the minimum fill heuristic
-        :param priority: if there is a list of prioritized variables (e.g. for MAP/MPE), then use this
-        :param X: list of variables from self.structure.nodes
-        :return: ordered list of variables
-        """
-        # initialize
-        G = net.get_interaction_graph()
-        pi = []
-
-        while len(X) > 0:
-            # find node that produces lowest number of new edges when eliminated
-            n_fills = []
-            for node in X:
-                n_fill = 0
-                nbors = [neighbor for neighbor in G.neighbors(node)]
-
-                for u in nbors:
-                    for v in [n for n in nbors if n is not u]:
-                        if (u, v) not in G.edges() and (v, u) not in G.edges():
-                            n_fill += 1
-                if priority:
-                    if node not in priority: n_fill = len(nbors)+1
-                n_fills.append(n_fill)
-
-            chosen_node = X.pop(n_fills.index(min(n_fills)))
-            if priority:
-                del priority[priority.index(chosen_node)]
-            pi.append(chosen_node)
-
-            # connect all non-adjacent neighbors of chosen node
-            nbors = [neighbor for neighbor in G.neighbors(chosen_node)]
-            for u in nbors:
-                for v in [n for n in nbors if n is not u]:
-                    if (u, v) not in G.edges() and (v, u) not in G.edges():
-                        G.add_edge(u, v)
-            G.remove_node(chosen_node)
-
-        return pi
-
     def maxxing(self, cpt: pd.DataFrame, Z_names: list):
         # create maxf(X), Y
         factor_x = cpt['p']
@@ -226,45 +155,34 @@ class BayesNet:
         for key in marg:
             new_row = {}
             for i, var in enumerate([y for y in Y.columns]):
-                new_row[var] = key[var]
+                new_row[var] = key[i]
             new_row['p'] = max(marg[key])
             nr = [[a for a in new_row.values()]]
             new_row = pd.DataFrame(nr, columns=list(new_row.keys()))
-            marg_cpt = pd.concat([max_cpt, new_row])
+            max_cpt = pd.concat([max_cpt, new_row])
 
         return max_cpt
 
     def marginalize(self, cpt: pd.DataFrame, Z_names: list):
-        # create f(X), Y
-        factor_x = cpt['p']
-        Y = cpt.drop([*Z_names, 'p'], axis=1)
+        Y = cpt.drop(columns=[*Z_names]); Y_names = [var for var in Y.columns if var != 'p']
+        ttable = list(itertools.product([False, True], repeat=len(Y_names)))
+        marg_cpt = pd.DataFrame(data=ttable, columns=Y_names)
 
-        marg = {}
-        for index, row in Y.iterrows():
-            if tuple(row.values) not in marg:
-                marg[tuple(row.values)] = factor_x[index]
-            else:
-                marg[tuple(row.values)] += factor_x[index]
-
-        marg_cpt = pd.DataFrame(columns=[*list(Y.columns),'p'])
-        for key in marg:
-            new_row = {}
-            for i, var in enumerate([y for y in Y.columns]):
-                new_row[var] = key[var]
-            new_row['p'] = marg[key]; nr = [[a for a in new_row.values()]]
-            new_row = pd.DataFrame(nr, columns=list(new_row.keys()))
-            marg_cpt = pd.concat([marg_cpt, new_row])
-
+        for i, row in marg_cpt.iterrows():
+            q_row = row.to_frame().T
+            d = pd.merge(q_row, cpt, on=list(Y_names), how='inner')
+            marg_cpt.loc[i, 'p'] = d['p'].sum(axis=0)
         return marg_cpt
 
     def factor_product(self, cpts: list):
-        all_names = list(set.union(*[set(names.columns) for names in cpts]).difference({'p'}))
+        all_names = list(set.union(*[set(names.columns) for names in cpts]).difference({'p'})); all_names.sort()
         ttable = list(itertools.product([False, True], repeat=len(all_names)))
         new_cpt = pd.DataFrame(data=ttable, columns=all_names)
 
         d = new_cpt.copy()
         for cpt in cpts:
-            vars = [var for var in cpt.columns if var is not 'p']
+            # print(cpt.columns,'\n',all_names,'\n\n')
+            vars = [var for var in cpt.columns if var != 'p']
             d = pd.merge(d, cpt, on=vars, how='inner')
         columns = [var for var in d.columns if var not in all_names]
         new_cpt['p'] = d[columns].product(axis=1)
@@ -272,17 +190,13 @@ class BayesNet:
         return new_cpt
 
     def normalize_factors(self, cpts: dict, evidence: dict):
-        normalized_cpts = cpts.copy()
+        normalized_cpts = {}
         for key in cpts:
-            if any(item in evidence.keys() for item in cpts[key].columns):
-                for idx, row in normalized_cpts[key].iterrows():
-                    overlapping_vars = list(set(row.index).intersection(set(evidence.keys())))
-                    for ev in overlapping_vars:
-                        a = cpts[key][ev][idx]; b = evidence[ev]
-                        if a != b:
-                            normalized_cpts[key]['p'][idx] = 0.0
-                            break
+            normalized_cpts[key] = self.reduce_factor(pd.Series(evidence), cpts[key])
         return normalized_cpts
+
+    def trivial_factor(self, cpt: pd.DataFrame):
+        return self.marginalize(cpt, [var for var in cpt.columns if var not in 'p'])
 
     def get_all_variables(self) -> List[str]:
         """
