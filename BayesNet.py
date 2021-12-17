@@ -164,13 +164,18 @@ class BayesNet:
         return max_cpt
 
     def marginalize(self, cpt: pd.DataFrame, Z_names: list):
-        Y = cpt.drop(columns=[*Z_names]); Y_names = [var for var in Y.columns if var != 'p']
+        Y = cpt.drop(columns=[*Z_names])
+        Y_names = [var for var in Y.columns if var != 'p']
         ttable = list(itertools.product([False, True], repeat=len(Y_names)))
         marg_cpt = pd.DataFrame(data=ttable, columns=Y_names)
 
+        # if there are no variables left, then you get the trivial factor
+        if not Y_names:
+            return cpt['p'].sum()
+
         for i, row in marg_cpt.iterrows():
             q_row = row.to_frame().T
-            d = pd.merge(q_row, cpt, on=list(Y_names), how='inner')
+            d = pd.merge(q_row, cpt, on=Y_names, how='inner')
             marg_cpt.loc[i, 'p'] = d['p'].sum(axis=0)
         return marg_cpt
 

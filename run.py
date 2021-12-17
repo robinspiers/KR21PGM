@@ -3,7 +3,7 @@ from BNReasoner import *
 from utils import *
 
 
-net = './testing/ABC.BIFXML'
+net = './testing/lecture_example.BIFXML'
 
 # constructs a BN object
 bn = BayesNet()
@@ -12,10 +12,10 @@ bn.load_from_bifxml(net)
 # create reasoner
 bnr = BNReasoner(bn)
 
-evidence = {'A': True}
+evidence = {'Winter?': True}
 
-x=['A']
-y=['C']
+x=['Wet Grass?']
+y=['Slippery Road?']
 
 
 """
@@ -26,17 +26,17 @@ USAGE
 # x and y must be lists, evidence is (always) a dict
 # output is boolean
 dsep = bnr.d_separated(x,y,evidence)
-# print('Are X and Y d-separated by evidence: ', dsep)
+print('Are X and Y d-separated by evidence: ', dsep)
 
 # ordering functions for determining elimination order
 # inputs should be network structure, y = list of query variables, and optional z = priority variables which are ordered first
-pi1 = mindeg_order(net=bn, query=y)
+pi1 = mindeg_order(net=bn, query=y, priority=x)
 pi2 = minfill_order(net=bn, query=y, priority=x)
 # print('\n\nVariable orderings:\n', pi1)
 # print('\n', pi2)
 
-# # prune network (which is used to instantiate the BN Reasoner) wrt query and evidence
-# pruned_net = bnr.prune_network(query=x, evidence=evidence)
+# # prune network (the network which is used to instantiate the BN Reasoner) wrt query and evidence
+pruned_net = bnr.prune_network(query=x, evidence=evidence)
 
 # Marginal distributions, with optional ordering function (name of function is input)
 # without evidence:

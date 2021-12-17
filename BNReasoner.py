@@ -108,7 +108,7 @@ class BNReasoner:
         if ordering_function:
             pi = ordering_function(self.bn, [var for var in self.bn.get_all_variables() if var not in query])
         else:
-            pi = query
+            pi = [var for var in self.bn.get_all_variables() if var not in query]
         # if calculating posterior marginals, then we normalize CPTs wrt the evidence
         if evidence:
             cpts = self.bn.normalize_factors(cpts, evidence)
@@ -150,7 +150,7 @@ class BNReasoner:
             f = [fk[cpt] for cpt in fk]
             f = self.bn.factor_product(f)
             f = self.bn.maxxing(f, [var])
-            new_key = 'f'+str(i)
+            new_key = 'f('+'-'.join(list(fk.keys()))+')'
             cpts[new_key] = f
 
         return cpts
