@@ -131,10 +131,11 @@ class BNReasoner:
         return cpts
 
     def MPE(self, evidence: dict, ordering_function=None):
-        cpts = self.bn.get_all_cpts()
         N_pr = self.prune_network(evidence=evidence)   # pruned network
-        Q = N_pr.get_all_variables()            # list of variables from N_pr
-        pi = ordering_function(N_pr, Q)         # ordering of Q
+        Q = N_pr.get_all_variables()
+        cpts = N_pr.get_all_cpts()
+
+        pi = ordering_function(N_pr, Q)
 
         cpts = self.bn.normalize_factors(cpts, evidence)
 
@@ -156,9 +157,10 @@ class BNReasoner:
         return cpts
 
     def MAP(self, query: list, evidence: dict, ordering_function=None):
-        cpts = self.bn.get_all_cpts()
         N_pr = self.prune_network(query=query, evidence=evidence)      # pruned network
-        Q = N_pr.get_all_variables()                        # list of variables from N_pr
+        Q = N_pr.get_all_variables()
+        cpts = N_pr.get_all_cpts()
+
         pi = ordering_function(N_pr, Q, priority=[var for var in Q if var not in query])
 
         cpts = self.bn.normalize_factors(cpts, evidence)
@@ -179,7 +181,7 @@ class BNReasoner:
                 f = self.bn.maxxing(f, [var])
             else:
                 f = self.bn.marginalize(f, [var])
-            new_key = 'f'+str(i)
+            new_key = 'f('+'-'.join(list(fk.keys()))+')'
             cpts[new_key] = f
 
         return cpts
