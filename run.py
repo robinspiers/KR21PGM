@@ -32,8 +32,8 @@ print('Are X and Y d-separated by evidence: ', dsep)
 # inputs should be network structure, y = list of query variables, and optional z = priority variables which are ordered first
 pi1 = mindeg_order(net=bn, query=y, priority=x)
 pi2 = minfill_order(net=bn, query=y, priority=x)
-# print('\n\nVariable orderings:\n', pi1)
-# print('\n', pi2)
+print('\n\nVariable orderings:\n', pi1)
+print('\n', pi2)
 
 # # prune network (the network which is used to instantiate the BN Reasoner) wrt query and evidence
 pruned_net = bnr.prune_network(query=x, evidence=evidence)

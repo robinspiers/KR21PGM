@@ -5,7 +5,8 @@ def mindeg_order(net, query: list, priority=None):
     :return: ordered list of variables
     """
     if priority and not (all(x in query for x in priority)):
-        return print(":::ERROR::: Prioritized variables not in query!")
+        print(":::ERROR::: Prioritized variables not in query!")
+        return query
 
     # initialize
     G = net.get_interaction_graph()
@@ -42,7 +43,8 @@ def minfill_order(net, query: list, priority: list=None):
     :return: ordered list of variables
     """
     if priority and not (all(x in query for x in priority)):
-        return print(":::ERROR::: Prioritized variables not in query!")
+        print(":::ERROR::: Prioritized variables not in query!")
+        return query
 
     # initialize
     G = net.get_interaction_graph()
