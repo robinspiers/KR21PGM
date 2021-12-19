@@ -2,6 +2,8 @@ import random
 
 
 def random_order(net, query: list, priority=None):
+    if priority is None:
+        priority = []
     """
     This function orders variables for elimination with the minimum degree heuristic
     :param X: list of variables from self.structure.nodes
