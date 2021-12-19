@@ -1,6 +1,7 @@
 import random
 from typing import Union
 from BayesNet import BayesNet
+from utils import *
 
 
 class BNReasoner:
@@ -130,7 +131,7 @@ class BNReasoner:
 
         return cpts
 
-    def MPE(self, evidence: dict, ordering_function=None):
+    def MPE(self, evidence: dict, ordering_function=random_order):
         N_pr = self.prune_network(evidence=evidence)   # pruned network
         Q = N_pr.get_all_variables()
         cpts = N_pr.get_all_cpts()
@@ -154,7 +155,7 @@ class BNReasoner:
 
         return cpts
 
-    def MAP(self, query: list, evidence: dict, ordering_function=None):
+    def MAP(self, query: list, evidence: dict, ordering_function=random_order):
         N_pr = self.prune_network(query=query, evidence=evidence)      # pruned network
         Q = N_pr.get_all_variables()
         cpts = N_pr.get_all_cpts()

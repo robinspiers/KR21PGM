@@ -1,3 +1,24 @@
+import random
+
+
+def random_order(net, query: list, priority=None):
+    """
+    This function orders variables for elimination with the minimum degree heuristic
+    :param X: list of variables from self.structure.nodes
+    :return: ordered list of variables
+    """
+    if priority and not (all(x in query for x in priority)):
+        print(":::ERROR::: Prioritized variables not in query!")
+        return
+
+    if priority:
+        random.shuffle(priority)
+        query = [var for var in query if var not in priority]
+    random.shuffle(query)
+
+    return priority + query
+
+
 def mindeg_order(net, query: list, priority=None):
     """
     This function orders variables for elimination with the minimum degree heuristic
@@ -6,7 +27,7 @@ def mindeg_order(net, query: list, priority=None):
     """
     if priority and not (all(x in query for x in priority)):
         print(":::ERROR::: Prioritized variables not in query!")
-        return query
+        return
 
     # initialize
     G = net.get_interaction_graph()
@@ -44,7 +65,7 @@ def minfill_order(net, query: list, priority: list=None):
     """
     if priority and not (all(x in query for x in priority)):
         print(":::ERROR::: Prioritized variables not in query!")
-        return query
+        return
 
     # initialize
     G = net.get_interaction_graph()

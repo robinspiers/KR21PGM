@@ -49,7 +49,7 @@ print(f'\n\nPosterior Marginal: Query={y}  ---  Evidence={evidence}\n', posterio
 
 """ Most likely instantiations: """
 # MAP:
-MAP = bnr.MAP(query=x, evidence=evidence, ordering_function=mindeg_order)
+MAP = bnr.MAP(query=x, evidence=evidence)
 print('\n\nMAP:\n', MAP)
 # MPE:
 MPE = bnr.MPE(evidence=evidence, ordering_function=minfill_order)
