@@ -1,3 +1,4 @@
+import random
 from typing import List, Tuple, Dict
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -139,27 +140,31 @@ class BayesNet:
         except KeyError:
             raise Exception('Variable not in the BN')
 
-    def maxxing(self, cpt: pd.DataFrame, Z_names: list):
-        # create maxf(X), Y
-        factor_x = cpt['p']
-        Y = cpt.drop([*Z_names, 'p'], axis=1)
+    def maxxing(self, cpt: pd.DataFrame, Z_name: list):
 
-        marg = {}
-        for index, row in Y.iterrows():
-            if tuple(row.values) not in marg:
-                marg[tuple(row.values)] = [factor_x[index]]
-            else:
-                marg[tuple(row.values)].append(factor_x[index])
+        Y = cpt.drop(columns=[*Z_name])
 
-        max_cpt = pd.DataFrame(columns=[*list(Y.columns),'p'])
-        for key in marg:
-            new_row = {}
-            for i, var in enumerate([y for y in Y.columns]):
-                new_row[var] = key[i]
-            new_row['p'] = max(marg[key])
-            nr = [[a for a in new_row.values()]]
-            new_row = pd.DataFrame(nr, columns=list(new_row.keys()))
-            max_cpt = pd.concat([max_cpt, new_row])
+        Y_names = [var for var in Y.columns if var != 'p' and 'inst_' not in var]
+        ttable = list(itertools.product([False, True], repeat=len(Y_names)))
+        max_cpt = pd.DataFrame(data=ttable, columns=Y_names)
+
+        if not Y_names:
+            idx = cpt['p'].idxmax()
+            max_val = cpt['p'].max()
+            new_str = 'inst_'+str(*Z_name)
+            cpt.loc[idx, new_str] = cpt.loc[idx, Z_name[0]]
+            return cpt.loc[idx]
+
+        for i, row in max_cpt.iterrows():
+            q_row = row.to_frame().T
+            d = pd.merge(q_row, cpt, on=Y_names, how='inner')
+            idx = d['p'].idxmax()
+            max_val = d['p'].max()
+
+            max_cpt.loc[i, 'p'] = max_val
+            new_str = 'inst_'+str(*Z_name)
+
+            max_cpt.loc[i, new_str] = d.loc[idx, Z_name[0]]
 
         return max_cpt
 
@@ -181,16 +186,19 @@ class BayesNet:
 
     def factor_product(self, cpts: list):
         all_names = list(set.union(*[set(names.columns) for names in cpts]).difference({'p'})); all_names.sort()
+        all_names = [var for var in all_names if 'inst_' not in var]
         ttable = list(itertools.product([False, True], repeat=len(all_names)))
         new_cpt = pd.DataFrame(data=ttable, columns=all_names)
 
         d = new_cpt.copy()
         for cpt in cpts:
             # print(cpt.columns,'\n',all_names,'\n\n')
-            vars = [var for var in cpt.columns if var != 'p']
+            vars = [var for var in cpt.columns if var != 'p' and 'inst_' not in var]
             d = pd.merge(d, cpt, on=vars, how='inner')
-        columns = [var for var in d.columns if var not in all_names]
+        columns = [var for var in d.columns if var not in all_names and 'inst_' not in var]
         new_cpt['p'] = d[columns].product(axis=1)
+        cols = [var for var in d.columns if 'inst_' in var]
+        new_cpt[cols] = d[cols]
 
         return new_cpt
 

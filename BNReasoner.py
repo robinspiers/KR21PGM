@@ -145,12 +145,10 @@ class BNReasoner:
                 if var in cpts[cpt].columns:
                     fk[cpt] = cpts[cpt]
 
-            for cpt in fk:
-                cpts.pop(cpt)
-
-            f = [fk[cpt] for cpt in fk]
+            f = [cpts.pop(cpt) for cpt in fk]
             f = self.bn.factor_product(f)
             f = self.bn.maxxing(f, [var])
+
             new_key = 'f('+'-'.join(list(fk.keys()))+')'
             cpts[new_key] = f
 
@@ -171,10 +169,7 @@ class BNReasoner:
                 if var in cpts[cpt].columns:
                     fk[cpt] = cpts[cpt]
 
-            for cpt in fk:
-                cpts.pop(cpt)
-
-            f = [fk[cpt] for cpt in fk]
+            f = [cpts.pop(cpt) for cpt in fk]
             f = self.bn.factor_product(f)
 
             if var in query:
