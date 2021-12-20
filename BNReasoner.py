@@ -124,7 +124,8 @@ class BNReasoner:
                 cpts.pop(cpt)
 
             f = [fk[cpt] for cpt in fk]
-            f = self.bn.factor_product(f)
+            if len(f) > 1: f = self.bn.factor_product(f)
+            else: f = f[0]
             f = self.bn.marginalize(f, [var])
             new_key = 'f'+str(i)
             cpts[new_key] = f
@@ -149,8 +150,8 @@ class BNReasoner:
             f = [cpts.pop(cpt) for cpt in fk]
             f = self.bn.factor_product(f)
             f = self.bn.maxxing(f, [var])
+            new_key = 'f_mult(' + '-'.join(list(fk.keys())) + ')' + '_max(' + var + ')'
 
-            new_key = 'f('+'-'.join(list(fk.keys()))+')'
             cpts[new_key] = f
 
         return cpts
@@ -175,9 +176,10 @@ class BNReasoner:
 
             if var in query:
                 f = self.bn.maxxing(f, [var])
+                new_key = 'f_mult(' + '-'.join(list(fk.keys())) + ')' + '_max(' + var + ')'
             else:
                 f = self.bn.marginalize(f, [var])
-            new_key = 'f('+'-'.join(list(fk.keys()))+')'
+                new_key = 'f_mult(' + '-'.join(list(fk.keys())) + ')' + '_sum(' + var + ')'
             cpts[new_key] = f
 
         return cpts

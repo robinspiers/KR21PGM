@@ -142,63 +142,55 @@ class BayesNet:
 
     def maxxing(self, cpt: pd.DataFrame, Z_name: list):
 
-        Y = cpt.drop(columns=[*Z_name])
-
-        Y_names = [var for var in Y.columns if var != 'p' and 'inst_' not in var]
+        Y_names = [var for var in cpt.columns if var != 'p' and var not in Z_name and 'inst_' not in var]
         ttable = list(itertools.product([False, True], repeat=len(Y_names)))
         max_cpt = pd.DataFrame(data=ttable, columns=Y_names)
+        new_str = 'inst_'+str(*Z_name)
 
         if not Y_names:
             idx = cpt['p'].idxmax()
-            max_val = cpt['p'].max()
-            new_str = 'inst_'+str(*Z_name)
             cpt.loc[idx, new_str] = cpt.loc[idx, Z_name[0]]
+            cpt = cpt.drop(columns=Z_name)
             return cpt.loc[idx]
 
         for i, row in max_cpt.iterrows():
             q_row = row.to_frame().T
             d = pd.merge(q_row, cpt, on=Y_names, how='inner')
-            idx = d['p'].idxmax()
-            max_val = d['p'].max()
-
-            max_cpt.loc[i, 'p'] = max_val
-            new_str = 'inst_'+str(*Z_name)
-
-            max_cpt.loc[i, new_str] = d.loc[idx, Z_name[0]]
+            max_cpt.loc[i, 'p'] = d['p'].max()
+            max_cpt.loc[i, new_str] = d.loc[d['p'].idxmax(), Z_name[0]]
 
         return max_cpt
 
-    def marginalize(self, cpt: pd.DataFrame, Z_names: list):
-        Y = cpt.drop(columns=[*Z_names])
-        Y_names = [var for var in Y.columns if var != 'p']
+    def marginalize(self, cpt: pd.DataFrame, Z_name: list):
+
+        Y_names = [var for var in cpt.columns if var != 'p' and var not in Z_name]
         ttable = list(itertools.product([False, True], repeat=len(Y_names)))
         marg_cpt = pd.DataFrame(data=ttable, columns=Y_names)
 
         # if there are no variables left, then you get the trivial factor
         if not Y_names:
-            return cpt['p'].sum()
+            return cpt['p'].sum(axis=0)
 
         for i, row in marg_cpt.iterrows():
-            q_row = row.to_frame().T
-            d = pd.merge(q_row, cpt, on=Y_names, how='inner')
+            d = pd.merge(row.to_frame().T, cpt, on=Y_names, how='inner')
             marg_cpt.loc[i, 'p'] = d['p'].sum(axis=0)
+
         return marg_cpt
 
     def factor_product(self, cpts: list):
-        all_names = list(set.union(*[set(names.columns) for names in cpts]).difference({'p'})); all_names.sort()
+
+        all_names = list(set.union(*[set(names.columns) for names in cpts]).difference({'p'}))
         all_names = [var for var in all_names if 'inst_' not in var]
         ttable = list(itertools.product([False, True], repeat=len(all_names)))
         new_cpt = pd.DataFrame(data=ttable, columns=all_names)
 
-        d = new_cpt.copy()
         for cpt in cpts:
-            # print(cpt.columns,'\n',all_names,'\n\n')
             vars = [var for var in cpt.columns if var != 'p' and 'inst_' not in var]
-            d = pd.merge(d, cpt, on=vars, how='inner')
-        columns = [var for var in d.columns if var not in all_names and 'inst_' not in var]
-        new_cpt['p'] = d[columns].product(axis=1)
-        cols = [var for var in d.columns if 'inst_' in var]
-        new_cpt[cols] = d[cols]
+            new_cpt = pd.merge(new_cpt, cpt, on=vars, how='inner')
+        columns = [var for var in new_cpt.columns if var not in all_names and 'inst_' not in var]
+
+        new_cpt['p'] = new_cpt[columns].product(axis=1)
+        new_cpt = new_cpt.drop(columns=[var for var in columns if var != 'p'])
 
         return new_cpt
 
