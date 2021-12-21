@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Evidence	Runtime
+MPE	5	random	{'hear-bark': 'true'}	0.08897137641906738
+MPE	5	random	{'hear-bark': 'true'}	0.08700060844421387
+MPE	5	random	{'hear-bark': 'true'}	0.11399388313293457
+MPE	5	mindeg	{'hear-bark': 'true'}	0.08695340156555176
+MPE	5	mindeg	{'hear-bark': 'true'}	0.08600282669067383
+MPE	5	mindeg	{'hear-bark': 'true'}	0.0869591236114502
+MPE	5	minfill	{'hear-bark': 'true'}	0.08595561981201172
+MPE	5	minfill	{'hear-bark': 'true'}	0.08798360824584961
+MPE	5	minfill	{'hear-bark': 'true'}	0.0869905948638916

@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Query	Evidence	Runtime
+MAP	5	random	['hear-bark']	{'dog-out': 'true'}	0.09596943855285645
+MAP	5	random	['hear-bark']	{'dog-out': 'true'}	0.09198141098022461
+MAP	5	random	['hear-bark']	{'dog-out': 'true'}	0.07597470283508301
+MAP	5	mindeg	['hear-bark']	{'dog-out': 'true'}	0.07297635078430176
+MAP	5	mindeg	['hear-bark']	{'dog-out': 'true'}	0.07098817825317383
+MAP	5	mindeg	['hear-bark']	{'dog-out': 'true'}	0.07100558280944824
+MAP	5	minfill	['hear-bark']	{'dog-out': 'true'}	0.0779869556427002
+MAP	5	minfill	['hear-bark']	{'dog-out': 'true'}	0.07700419425964355
+MAP	5	minfill	['hear-bark']	{'dog-out': 'true'}	0.07698607444763184

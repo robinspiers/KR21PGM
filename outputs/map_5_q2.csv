@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Query	Evidence	Runtime
+MAP	5	random	['hear-bark']	{'family-out': 'false', 'bowel-problem': 'false'}	0.0709989070892334
+MAP	5	random	['hear-bark']	{'family-out': 'false', 'bowel-problem': 'false'}	0.09496426582336426
+MAP	5	random	['hear-bark']	{'family-out': 'false', 'bowel-problem': 'false'}	0.07900166511535645
+MAP	5	mindeg	['hear-bark']	{'family-out': 'false', 'bowel-problem': 'false'}	0.0719757080078125
+MAP	5	mindeg	['hear-bark']	{'family-out': 'false', 'bowel-problem': 'false'}	0.0719747543334961
+MAP	5	mindeg	['hear-bark']	{'family-out': 'false', 'bowel-problem': 'false'}	0.07297778129577637
+MAP	5	minfill	['hear-bark']	{'family-out': 'false', 'bowel-problem': 'false'}	0.08097434043884277
+MAP	5	minfill	['hear-bark']	{'family-out': 'false', 'bowel-problem': 'false'}	0.07898616790771484
+MAP	5	minfill	['hear-bark']	{'family-out': 'false', 'bowel-problem': 'false'}	0.07996702194213867
