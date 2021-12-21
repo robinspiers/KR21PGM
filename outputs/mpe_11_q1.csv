@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Evidence	Runtime
+MPE	11	random	{'Blurry Vision': True}	2.3272716999053955
+MPE	11	random	{'Blurry Vision': True}	0.9777243137359619
+MPE	11	random	{'Blurry Vision': True}	3.9567201137542725
+MPE	11	mindeg	{'Blurry Vision': True}	0.7837667465209961
+MPE	11	mindeg	{'Blurry Vision': True}	0.7657666206359863
+MPE	11	mindeg	{'Blurry Vision': True}	0.7927558422088623
+MPE	11	minfill	{'Blurry Vision': True}	0.8747227191925049
+MPE	11	minfill	{'Blurry Vision': True}	0.7617700099945068
+MPE	11	minfill	{'Blurry Vision': True}	0.8087708950042725

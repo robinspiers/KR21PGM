@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Query	Evidence	Runtime
+MAP	11	random	['Blurry Vision']	{'Headache': True, 'Diabetes': True, 'High Blood Pressure': False}	1.3325724601745605
+MAP	11	random	['Blurry Vision']	{'Headache': True, 'Diabetes': True, 'High Blood Pressure': False}	1.4695279598236084
+MAP	11	random	['Blurry Vision']	{'Headache': True, 'Diabetes': True, 'High Blood Pressure': False}	1.377561330795288
+MAP	11	mindeg	['Blurry Vision']	{'Headache': True, 'Diabetes': True, 'High Blood Pressure': False}	0.7417752742767334
+MAP	11	mindeg	['Blurry Vision']	{'Headache': True, 'Diabetes': True, 'High Blood Pressure': False}	0.7377448081970215
+MAP	11	mindeg	['Blurry Vision']	{'Headache': True, 'Diabetes': True, 'High Blood Pressure': False}	0.7657859325408936
+MAP	11	minfill	['Blurry Vision']	{'Headache': True, 'Diabetes': True, 'High Blood Pressure': False}	1.507533311843872
+MAP	11	minfill	['Blurry Vision']	{'Headache': True, 'Diabetes': True, 'High Blood Pressure': False}	1.4525470733642578
+MAP	11	minfill	['Blurry Vision']	{'Headache': True, 'Diabetes': True, 'High Blood Pressure': False}	1.4585638046264648

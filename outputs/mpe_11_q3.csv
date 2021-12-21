@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Evidence	Runtime
+MPE	11	random	{'High Blood Pressure': True}	2.0763185024261475
+MPE	11	random	{'High Blood Pressure': True}	2.567189931869507
+MPE	11	random	{'High Blood Pressure': True}	3.2119603157043457
+MPE	11	mindeg	{'High Blood Pressure': True}	0.783759355545044
+MPE	11	mindeg	{'High Blood Pressure': True}	0.8307197093963623
+MPE	11	mindeg	{'High Blood Pressure': True}	0.7647652626037598
+MPE	11	minfill	{'High Blood Pressure': True}	0.7767601013183594
+MPE	11	minfill	{'High Blood Pressure': True}	0.8677539825439453
+MPE	11	minfill	{'High Blood Pressure': True}	0.7807807922363281
