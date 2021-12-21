@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Query	Evidence	Runtime
+MAP	18	random	['Starts']	{'Alternator': 'Ok', 'Leak': 'NoLeak', 'Starter': 'Faulted'}	0.45285558700561523
+MAP	18	random	['Starts']	{'Alternator': 'Ok', 'Leak': 'NoLeak', 'Starter': 'Faulted'}	0.6178135871887207
+MAP	18	random	['Starts']	{'Alternator': 'Ok', 'Leak': 'NoLeak', 'Starter': 'Faulted'}	1.3135654926300049
+MAP	18	mindeg	['Starts']	{'Alternator': 'Ok', 'Leak': 'NoLeak', 'Starter': 'Faulted'}	0.3848764896392822
+MAP	18	mindeg	['Starts']	{'Alternator': 'Ok', 'Leak': 'NoLeak', 'Starter': 'Faulted'}	0.36591315269470215
+MAP	18	mindeg	['Starts']	{'Alternator': 'Ok', 'Leak': 'NoLeak', 'Starter': 'Faulted'}	0.3708922863006592
+MAP	18	minfill	['Starts']	{'Alternator': 'Ok', 'Leak': 'NoLeak', 'Starter': 'Faulted'}	0.37191152572631836
+MAP	18	minfill	['Starts']	{'Alternator': 'Ok', 'Leak': 'NoLeak', 'Starter': 'Faulted'}	0.3788635730743408
+MAP	18	minfill	['Starts']	{'Alternator': 'Ok', 'Leak': 'NoLeak', 'Starter': 'Faulted'}	0.3608887195587158

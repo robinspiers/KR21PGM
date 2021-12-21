@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Query	Evidence	Runtime
+MAP	18	random	['Starts']	{'BatteryAge': 'Old', 'Leak': 'NoLeak', 'SparkPlugs': 'Ok'}	0.4118776321411133
+MAP	18	random	['Starts']	{'BatteryAge': 'Old', 'Leak': 'NoLeak', 'SparkPlugs': 'Ok'}	0.5618491172790527
+MAP	18	random	['Starts']	{'BatteryAge': 'Old', 'Leak': 'NoLeak', 'SparkPlugs': 'Ok'}	0.7637560367584229
+MAP	18	mindeg	['Starts']	{'BatteryAge': 'Old', 'Leak': 'NoLeak', 'SparkPlugs': 'Ok'}	0.3749096393585205
+MAP	18	mindeg	['Starts']	{'BatteryAge': 'Old', 'Leak': 'NoLeak', 'SparkPlugs': 'Ok'}	0.38585376739501953
+MAP	18	mindeg	['Starts']	{'BatteryAge': 'Old', 'Leak': 'NoLeak', 'SparkPlugs': 'Ok'}	0.42384839057922363
+MAP	18	minfill	['Starts']	{'BatteryAge': 'Old', 'Leak': 'NoLeak', 'SparkPlugs': 'Ok'}	0.3848609924316406
+MAP	18	minfill	['Starts']	{'BatteryAge': 'Old', 'Leak': 'NoLeak', 'SparkPlugs': 'Ok'}	0.3768775463104248
+MAP	18	minfill	['Starts']	{'BatteryAge': 'Old', 'Leak': 'NoLeak', 'SparkPlugs': 'Ok'}	0.3769097328186035

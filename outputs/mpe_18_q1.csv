@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Evidence	Runtime
+MPE	18	random	{'Starts': 'Yes'}	2.85909104347229
+MPE	18	random	{'Starts': 'Yes'}	1.647458553314209
+MPE	18	random	{'Starts': 'Yes'}	0.9897143840789795
+MPE	18	mindeg	{'Starts': 'Yes'}	0.526862382888794
+MPE	18	mindeg	{'Starts': 'Yes'}	0.46887874603271484
+MPE	18	mindeg	{'Starts': 'Yes'}	0.45484137535095215
+MPE	18	minfill	{'Starts': 'Yes'}	0.4858579635620117
+MPE	18	minfill	{'Starts': 'Yes'}	0.46888017654418945
+MPE	18	minfill	{'Starts': 'Yes'}	0.52384352684021

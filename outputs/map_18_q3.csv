@@ -1,0 +1,10 @@
+Method	Vars	Ordering	Query	Evidence	Runtime
+MAP	18	random	['Starts']	{'FanBelt': 'Broken', 'Leak2': 'False', 'FuelPump': 'Ok'}	0.7777614593505859
+MAP	18	random	['Starts']	{'FanBelt': 'Broken', 'Leak2': 'False', 'FuelPump': 'Ok'}	0.6108369827270508
+MAP	18	random	['Starts']	{'FanBelt': 'Broken', 'Leak2': 'False', 'FuelPump': 'Ok'}	0.6997759342193604
+MAP	18	mindeg	['Starts']	{'FanBelt': 'Broken', 'Leak2': 'False', 'FuelPump': 'Ok'}	0.37189316749572754
+MAP	18	mindeg	['Starts']	{'FanBelt': 'Broken', 'Leak2': 'False', 'FuelPump': 'Ok'}	0.41589784622192383
+MAP	18	mindeg	['Starts']	{'FanBelt': 'Broken', 'Leak2': 'False', 'FuelPump': 'Ok'}	0.40886926651000977
+MAP	18	minfill	['Starts']	{'FanBelt': 'Broken', 'Leak2': 'False', 'FuelPump': 'Ok'}	0.4028937816619873
+MAP	18	minfill	['Starts']	{'FanBelt': 'Broken', 'Leak2': 'False', 'FuelPump': 'Ok'}	0.3999032974243164
+MAP	18	minfill	['Starts']	{'FanBelt': 'Broken', 'Leak2': 'False', 'FuelPump': 'Ok'}	0.37189388275146484
