@@ -82,23 +82,23 @@
     <!-- PCTs -->
     <DEFINITION>
         <FOR>Stress</FOR>
-        <TABLE>0.77 0.23</TABLE>
+        <TABLE>0.23 0.77</TABLE>
     </DEFINITION>
     <DEFINITION>
         <FOR>High Sugar Intake</FOR>
-        <TABLE>0.8 0.2</TABLE>
+        <TABLE>0.2 0.8</TABLE>
     </DEFINITION>
     <DEFINITION>
         <FOR>Obesity</FOR>
         <GIVEN>Stress</GIVEN>
         <GIVEN>High Sugar Intake</GIVEN>
-        <TABLE>0.95 0.05 0.2 0.8 0.95 0.05 0.1 0.9</TABLE> <!-- Order: Stress, High Sugar Intake, Obesity-->
+        <TABLE>0.9 0.1 0.05 0.95 0.8 0.2 0.05 0.95</TABLE> <!-- Order: Stress, High Sugar Intake, Obesity-->
     </DEFINITION>
     <DEFINITION>
         <FOR>Sleep Deprivation</FOR>
         <GIVEN>Stress</GIVEN>
         <GIVEN>Obesity</GIVEN>
-        <TABLE>0.45 0.55 0.4 0.6 0.3 0.7 0.25 0.75</TABLE>
+        <TABLE>0.75 0.25 0.7 0.3 0.6 0.4 0.55 0.45</TABLE>
     </DEFINITION>
     <DEFINITION>
         <FOR>Headache</FOR>
@@ -106,14 +106,14 @@
         <GIVEN>High Sugar Intake</GIVEN>
         <GIVEN>Sleep Deprivation</GIVEN>
         <GIVEN>Diabetes</GIVEN>
-        <TABLE>0.9 0.1 0.83 0.17 0.8 0.2 0.6 0.4 0.9 0.1 0.75 0.25 0.65 0.35 0.35 0.65 0.48 0.52 0.4 0.6 0.43 0.57 0.1 0.9 0.3 0.7 0.3 0.7 0.1 0.9 0.07 0.93</TABLE> <!-- Order: Stress, High Sugar Intake, Sleep Deprivation, Diabetes, Headache-->
+        <TABLE>0.93 0.07 0.9 0.1 0.7 0.3 0.7 0.3 0.9 0.1 0.57 0.43 0.6 0.4 0.52 0.48 0.65 0.35 0.35 0.65 0.25 0.75 0.1 0.9 0.4 0.6 0.2 0.8 0.17 0.83 0.1 0.9</TABLE> <!-- Order: Stress, High Sugar Intake, Sleep Deprivation, Diabetes, Headache-->
     </DEFINITION>
     <DEFINITION>
         <FOR>Diabetes</FOR>
         <GIVEN>Stress</GIVEN>
         <GIVEN>High Sugar Intake</GIVEN>
         <GIVEN>Obesity</GIVEN>
-        <TABLE>0.7 0.3 0.65 0.35 0.8 0.2 0.6 0.4 0.8 0.2 0.6 0.4 0.85 0.15 0.01 0.99</TABLE>
+        <TABLE>0.99 0.01 0.15 0.85 0.4 0.6 0.2 0.8 0.4 0.6 0.2 0.8 0.35 0.65 0.3 0.7</TABLE>
     </DEFINITION>
     <DEFINITION>
         <FOR>Digestive Problems</FOR>
@@ -121,26 +121,26 @@
         <GIVEN>High Sugar Intake</GIVEN>
         <GIVEN>Obesity</GIVEN>
         <GIVEN>Diabetes</GIVEN>
-        <TABLE>0.6 0.4 0.7 0.3 0.85 0.15 0.95 0.05 0.6 0.4 0.6 0.4 0.8 0.2 0.9 0.1 0.6 0.4 0.7 0.3 0.8 0.2 0.7 0.3 0.8 0.2 0.9 0.1 0.65 0.35 0.4 0.6</TABLE>
+        <TABLE>0.6 0.4 0.35 0.65 0.1 0.9 0.2 0.8 0.3 0.7 0.2 0.8 0.3 0.7 0.4 0.6 0.1 0.9 0.2 0.8 0.4 0.6 0.4 0.6 0.05 0.95 0.15 0.85 0.3 0.7 0.4 0.6</TABLE>
     </DEFINITION>
     <DEFINITION>
         <FOR>Heart Failure</FOR>
         <GIVEN>Diabetes</GIVEN>
         <GIVEN>High Blood Pressure</GIVEN>
-        <TABLE>0.75 0.25 0.65 0.35 0.7 0.3 0.3 0.7</TABLE>
+        <TABLE>0.7 0.3 0.3 0.7 0.35 0.65 0.25 0.75</TABLE>
     </DEFINITION>
     <DEFINITION>
         <FOR>High Blood Pressure</FOR>
         <GIVEN>Stress</GIVEN>
         <GIVEN>Diabetes</GIVEN>
         <GIVEN>Digestive Problems</GIVEN>
-        <TABLE>0.8 0.2 0.75 0.25 0.6 0.4 0.65 0.35 0.65 0.35 0.8 0.2 0.6 0.4 0.35 0.65</TABLE>
+        <TABLE>0.65 0.35 0.4 0.6 0.2 0.8 0.35 0.65 0.35 0.65 0.4 0.6 0.25 0.75 0.2 0.8 </TABLE>
     </DEFINITION>
     <DEFINITION>
         <FOR>Depression</FOR>
         <GIVEN>Stress</GIVEN>
         <GIVEN>Sleep Deprivation</GIVEN>
-        <TABLE>0.4 0.6 0.35 0.65 0.3 0.7 0.1 0.9</TABLE>
+        <TABLE>0.9 0.1 0.7 0.3 0.65 0.35 0.6 0.4</TABLE>
     </DEFINITION>
     <DEFINITION>
         <FOR>Blurry Vision</FOR>
@@ -148,7 +148,7 @@
         <GIVEN>Headache</GIVEN>
         <GIVEN>Heart Failure</GIVEN>
         <GIVEN>High Blood Pressure</GIVEN>
-        <TABLE>0.37 0.63 0.2 0.8 0.17 0.83 0.15 0.85 0.33 0.67 0.15 0.85 0.15 0.85 0.08 0.92 0.23 0.77 0.2 0.8 0.15 0.85 0.15 0.85 0.3 0.7 0.1 0.9 0.08 0.92 0.03 0.97</TABLE>
+        <TABLE>0.97 0.03 0.92 0.08 0.9 0.1 0.7 0.3 0.85 0.15 0.85 0.15 0.8 0.2 0.77 0.23 0.92 0.08 0.85 0.15 0.85 0.15 0.67 0.33 0.85 0.15 0.83 0.17 0.8 0.2 0.63 0.37</TABLE>
     </DEFINITION>
 </NETWORK>
 </BIF>
